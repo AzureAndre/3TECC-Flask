@@ -1,0 +1,16 @@
+<hr>
+<h2>Create Post</h2>
+<form action="/allposts" method="POST">
+    Title: <input type="text" name="title" id="title">
+    <br>
+    Content: <textarea name="content" id="content"></textarea>
+    <br>
+    <input type="submit" value="Create Post">
+</form> 
+<hr>
+
+
+
+             <a href="/posts/delete/{{ post.id }}" onclick="return confirm('Are you sure you want to delete this post?')">Delete</a>
+             <a href="/posts/edit/{{ post.id }}">Edit</a>
+             <hr>

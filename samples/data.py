@@ -1,4 +1,7 @@
+
+# Sample data for the application
 allposts= [
+
     {
         'title': 'Post 1',
         'content': 'This is the content of post 1.',
@@ -22,3 +25,6 @@ allposts= [
         'content': 'This is the content of post 5.'
     }
 ]
+
+# Read data from DB
+dbposts = Post.query.all()
