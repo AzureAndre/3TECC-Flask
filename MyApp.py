@@ -1,31 +1,8 @@
-from flask import Flask, render_template as RenderTemplate      # Import the Flask class from the flask module
+from flask import Flask, render_template as RenderTemplate, request, redirect       # Import the Flask class from the flask module
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime as dt
 
-allposts= [
-    {
-        'title': 'Post 1',
-        'content': 'This is the content of post 1.',
-        'author': 'Author 1'
-    },
-    {
-        'title': 'Post 2',
-        'content': 'This is the content of post 2.'
-    },
-    {
-        'title': 'Post 3',
-        'content': 'This is the content of post 3.'
-    },
-    {
-        'title': 'Post 4',
-        'content': 'This is the content of post 4.',
-        'author': 'Author 4'
-    },
-    {
-        'title': 'Post 5',
-        'content': 'This is the content of post 5.'
-    }
-]
+
 
 app = Flask(__name__)           # Create an instance of the Flask class, passing the name of the module as an argument
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.db'
@@ -68,10 +45,39 @@ def add_post():
 
     return 'Posts added to the database! '
 
-@app.route('/allposts')
-def posts():
-    return RenderTemplate('allposts.html', posts=allposts)
+@app.route('/allposts',methods=['GET','POST'])
 
+def posts():
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        new_post = Post(title=title, content=content, author='Andre')
+        db.session.add(new_post)
+        db.session.commit()
+        return redirect('/allposts')
+    else:
+        dbposts= Post.query.order_by(Post.date_posted.desc()).all()
+        return RenderTemplate('allposts.html', posts=dbposts)
+
+@app.route('/posts/delete/<int:id>')
+def delete_post(id):
+    post = Post.query.get(id)
+    db.session.delete(post)
+    db.session.commit()
+    return redirect('/allposts')
+
+
+# Edit a post by ID
+@app.route('/posts/edit/<int:id>', methods=['GET','POST'])
+def edit_post(id):
+    dbpost = Post.query.get(id)
+    if request.method == 'POST':
+        dbpost.title = request.form['title']
+        dbpost.content = request.form['content']
+        db.session.commit()
+        return redirect('/allposts')
+    else:
+        return RenderTemplate('editpost.html', post=dbpost)
 
 @app.route('/')                 # Define a route for the root URL ("/") and associate it with the hello_world function
 
